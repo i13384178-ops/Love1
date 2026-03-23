@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Mesajınız var..</title>
+</head>
+<body>
+
+    <!-- Loading Ekranı -->
+    <div id="loading-screen">
+        <div class="loading-heart">💖</div>
+        <p>Yükleniyor...</p>
+    </div>
+
+    <h1 class="yanan-baslik" id="page-title" style="display:none;">Bir Yeni Mesaj<br>
+        <span style="font-size:30px; font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">
+            Kalbe tıklar mısın? 💖<br> ve içindeki mesajı aç.
+        </span>
+    </h1>
+
+    <audio id="bg-music" loop></audio>
+
+    <div class="contenedor" id="main-container" style="display:none;">
+        <div class="envoltura-sobre">
+            <div class="sobre">
+                <div class="carta">
+                    <div class="contenido">
+                        <strong>Aşağıya kaydır lütfen 💖 <br>Şeyy</strong>
+                        <p id="romantic-message">
+                            "Bunu sana söylemek için doğru zamanı bekledim… Çünkü seninle her konuştuğumda, içimde bir şeyler değişti. Seni tanıdıkça, kelimeler daha anlamlı, günler daha güzel olmaya başladı. Artık seninle sadece konuşmak değil, daha fazlasını yaşamak istiyorum. Eğer sen de istersen… benimle bir adım daha ileri gider misin? <strong>Benimle çıkar mısın?</strong>"
+                        </p>
+                        <div class="evet-hayir-anim-wrap">
+                            <div class="evet-hayir-container" id="butonlar">
+                                <a class="evet-buton" id="evet-btn" href="evet.html">Evet 💖</a>
+                                <button type="button" class="evet-buton" id="hayir-btn">HAYIR</button>
+                            </div>
+                            <div id="hayir-error" class="hayir-error">ERROR (Hayır cevabı bulunamadı!)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="corazon"></div>
+            <div class="solapa-derecha"></div>
+            <div class="solapa-izquierda"></div>
+        </div>
+    </div>
+
+    <br><br><br>
+    <div class="copy" id="copy-footer" style="display:none;">
+        TASARLAYAN &copy; IMPARATOR
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue, push, serverTimestamp, runTransaction }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // =============================================
+        // 🔥 BURAYA KENDİ FIREBASE CONFIG'İNİ YAZ
+        // =============================================
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDgTN1Hx1mphvxilQGfQCZkn6M70kDmhsY",
+            authDomain:        "asksitesi-c5e1c.firebaseapp.com",
+            databaseURL:       "https://asksitesi-c5e1c-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId:         "asksitesi-c5e1c",
+            storageBucket:     "asksitesi-c5e1c.firebasestorage.app",
+            messagingSenderId: "1764542020",
+            appId:             "1:1764542020:web:ac1389fb14e17ffc229e11"
+        };
+
+        const DEFAULTS = {
+            message: `"Bunu sana söylemek için doğru zamanı bekledim… Çünkü seninle her konuştuğumda, içimde bir şeyler değişti. Seni tanıdıkça, kelimeler daha anlamlı, günler daha güzel olmaya başladı. Artık seninle sadece konuşmak değil, daha fazlasını yaşamak istiyorum. Eğer sen de istersen… benimle bir adım daha ileri gider misin? <strong>Benimle çıkar mısın?</strong>"`,
+            music: "music2.mp3",
+            themeColor: "pink"
+        };
+
+        let db = null;
+        let firebaseOk = false;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
+                firebaseOk = true;
+        } catch(e) {
+            console.warn("Firebase başlatılamadı, offline modda çalışıyor:", e);
+        }
+
+        // ---- Tema Uygula ----
+        function applyTheme(color) {
+            const themes = {
+                pink:   { fondo:"#ffebf2", fondo_sobre:"#ffe3ed", solapa:"#ffccd5", cuerpo:"#ffc1d1", corazon:"#ff0000" },
+                red:    { fondo:"#fff0f0", fondo_sobre:"#ffdada", solapa:"#ffb3b3", cuerpo:"#ff9898", corazon:"#cc0000" },
+                purple: { fondo:"#f3eeff", fondo_sobre:"#e8d8ff", solapa:"#d0b0ff", cuerpo:"#c090ff", corazon:"#8a00d4" }
+            };
+            const t = themes[color] || themes.pink;
+            const r = document.documentElement;
+            r.style.setProperty("--fondo",        t.fondo);
+            r.style.setProperty("--fondo-sobre",  t.fondo_sobre);
+            r.style.setProperty("--solapa-sobre", t.solapa);
+            r.style.setProperty("--cuerpo-sobre", t.cuerpo);
+            r.style.setProperty("--corazon",      t.corazon);
+        }
+
+        // ---- Müzik ----
+        const audio = document.getElementById("bg-music");
+        let currentMusic = "";
+        let userInteracted = false;
+
+        document.body.addEventListener("click", () => {
+            userInteracted = true;
+            audio.play().catch(() => {});
+        }, { once: false });
+
+        function loadMusic(src) {
+            if (src === currentMusic) return;
+            currentMusic = src;
+            audio.src = src;
+            audio.load();
+            if (userInteracted) audio.play().catch(() => {});
+        }
+
+        // ---- Loading gizle ----
+        function hideLoading() {
+            document.getElementById("loading-screen").style.display = "none";
+            document.getElementById("page-title").style.display = "block";
+            document.getElementById("main-container").style.display = "block";
+            document.getElementById("copy-footer").style.display = "block";
+        }
+
+        // ---- Firebase Bağlı Mod ----
+        if (firebaseOk && db) {
+            // Ayarları dinle
+            onValue(ref(db, "settings"), (snap) => {
+                const data = snap.val() || {};
+                document.getElementById("romantic-message").innerHTML = data.message || DEFAULTS.message;
+                loadMusic(data.music || DEFAULTS.music);
+                applyTheme(data.themeColor || "pink");
+                hideLoading();
+            });
+
+            // Ziyaretçi sayacı
+            const visitorRef = ref(db, "visitors/online");
+            runTransaction(visitorRef, (val) => (val || 0) + 1);
+            window.addEventListener("beforeunload", () => {
+                runTransaction(visitorRef, (val) => Math.max((val || 1) - 1, 0));
+            });
+
+            // EVET kaydı
+            document.getElementById("evet-btn").addEventListener("click", () => {
+                push(ref(db, "events/yesClicks"), {
+                    timestamp: serverTimestamp(),
+                    date: new Date().toLocaleString("tr-TR")
+                });
+            });
+
+            // HAYIR kaydı (script.js'den CustomEvent ile gelir)
+            window.addEventListener("hayir-clicked", () => {
+                push(ref(db, "events/noClicks"), {
+                    timestamp: serverTimestamp(),
+                    date: new Date().toLocaleString("tr-TR")
+                });
+            });
+
+        } else {
+            loadMusic(DEFAULTS.music);
+            applyTheme("pink");
+            hideLoading();
+        }
+    </script>
+
+    <!-- Orijinal zarf/kalp animasyon scripti -->
+    <script src="script.js"></script>
+
+</body>
+</html>

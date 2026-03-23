@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+    <title>💖 Evet! 💖</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            background: #120c1c;
+        }
+        .love-text {
+            position: fixed;
+            top: 7vh;
+            left: 0;
+            width: 100vw;
+            text-align: center;
+            font-family: 'Marck Script', 'Comic Sans MS', cursive, sans-serif;
+            font-size: 2.2rem;
+            color: #90153a;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1;
+            user-select: none;
+        }
+        @media (max-width: 600px) {
+            .love-text { font-size: 1.2rem; top: 3vh; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="love-text" id="love-text">
+        💞Kalbe tıkla ve aşkımız başlasın💞<br>
+        💞Seviyorum seni yar💞
+    </div>
+
+    <audio id="bg-audio" autoplay loop></audio>
+    <canvas id="alx"></canvas>
+
+    <!-- Firebase: müzik ve mesaj çek -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getDatabase, ref, onValue }
+            from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+        // =============================================
+        // 🔥 BURAYA KENDİ FIREBASE CONFIG'İNİ YAZ
+        // =============================================
+        const firebaseConfig = {
+            apiKey:            "AIzaSyDgTN1Hx1mphvxilQGfQCZkn6M70kDmhsY",
+            authDomain:        "asksitesi-c5e1c.firebaseapp.com",
+            databaseURL:       "https://asksitesi-c5e1c-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId:         "asksitesi-c5e1c",
+            storageBucket:     "asksitesi-c5e1c.firebasestorage.app",
+            messagingSenderId: "1764542020",
+            appId:             "1:1764542020:web:ac1389fb14e17ffc229e11"
+        };
+
+        const audio = document.getElementById("bg-audio");
+
+        // Kullanıcı etkileşimiyle müzik başlat
+        function startMusic(src) {
+            audio.src = src || "music1.mp3";
+            audio.muted = false;
+            const tryPlay = () => {
+                audio.play().catch(() => {});
+                document.removeEventListener("click",      tryPlay);
+                document.removeEventListener("touchstart", tryPlay);
+            };
+            document.addEventListener("click",      tryPlay);
+            document.addEventListener("touchstart", tryPlay);
+            audio.play().catch(() => {});
+        }
+
+        try {
+            if (firebaseConfig.apiKey !== "AIzaSyDgTN1Hx1mphvxilQGfQCZkn6M70kDmhsY") {
+                const app = initializeApp(firebaseConfig);
+                const db  = getDatabase(app);
+                onValue(ref(db, "settings"), (snap) => {
+                    const data = snap.val() || {};
+                    startMusic(data.music || "music1.mp3");
+                    if (data.evetMessage) {
+                        document.getElementById("love-text").innerHTML = data.evetMessage;
+                    }
+                });
+            } else {
+                startMusic("music1.mp3");
+            }
+        } catch(e) {
+            startMusic("music1.mp3");
+        }
+    </script>
+
+    <!-- Orijinal canvas kalp animasyon scripti -->
+    <script src="heart.js"></script>
+
+</body>
+</html>

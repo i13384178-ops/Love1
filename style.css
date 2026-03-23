@@ -1,0 +1,428 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primario: #fff;
+    --fondo: #ffebf2;
+    --fondo-sobre: #ffe3ed;
+    --solapa-sobre: #ffccd5;
+    --cuerpo-sobre: #ffc1d1;
+    --sombra: rgba(0, 0, 0, 0.2);
+    --texto: #003049;
+    --corazon: #ff0000;
+}
+
+body {
+    background: var(--fondo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background 0.6s ease;
+}
+
+/* ============= LOADING ============= */
+#loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--fondo);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    gap: 16px;
+}
+.loading-heart {
+    font-size: 60px;
+    animation: loadingPulse 0.9s ease-in-out infinite;
+}
+#loading-screen p {
+    font-family: 'Marck Script', cursive;
+    font-size: 22px;
+    color: #c9184a;
+}
+@keyframes loadingPulse {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.25); }
+}
+
+/* ============= BAŞLIK ============= */
+.yanan-baslik {
+    animation: yavasYanSondur 2.5s linear infinite;
+    font-family: 'Marck Script', cursive;
+    font-size: 46px;
+    font-weight: bold;
+    color: #4e4b4c;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 24px #ffb5cd55;
+    margin-bottom: 36px;
+    text-align: center;
+}
+
+.alt-baslik {
+    font-size: 32px;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    color: #b3003c;
+    font-weight: 500;
+    letter-spacing: 1px;
+    opacity: 0.80;
+}
+
+@keyframes yavasYanSondur {
+    0%   { opacity: 1; }
+    40%  { opacity: 1; }
+    60%  { opacity: 0.15; }
+    100% { opacity: 1; }
+}
+
+/* ============= ZARF ============= */
+.contenedor {
+    width: 400px;
+}
+
+.envoltura-sobre {
+    position: relative;
+    background-color: var(--fondo-sobre);
+    box-shadow: 0 0 40px var(--sombra);
+    border-radius: 15px;
+}
+
+.sobre {
+    position: relative;
+    width: 400px;
+    height: 300px;
+}
+
+.sobre::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 4;
+    border-top: 180px solid var(--solapa-sobre);
+    border-right: 200px solid transparent;
+    border-left: 200px solid transparent;
+    transform-origin: top;
+    transition: all 0.5s ease-in-out 0.7s;
+    border-radius: 10px;
+}
+
+.solapa-derecha {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(100% 0, 0 100%, 100% 100%);
+    background-color: var(--cuerpo-sobre);
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.solapa-izquierda {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    background-color: var(--cuerpo-sobre);
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.carta {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    transition: transform .5s ease-in-out;
+}
+
+.carta:hover {
+    transform: scale(1.02);
+}
+
+.contenido {
+    font-family: 'Marck Script', cursive;
+    font-size: 24px;
+    color: #d6336c;
+    line-height: 1.6;
+    text-align: center;
+    border: 3px dotted var(--texto);
+    padding: 10px;
+    height: 100%;
+    cursor: pointer;
+    overflow-y: scroll;
+}
+
+strong {
+    font-size: 26px;
+    color: #c9184a;
+}
+
+/* ============= BUTONLAR ============= */
+.evet-hayir-anim-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 48px;
+    min-width: 240px;
+    position: relative;
+}
+
+.evet-hayir-container {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 15px;
+    transition: opacity 0.2s;
+}
+
+.hayir-error {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Marck Script', cursive;
+    font-size: 12px;
+    color: #262223;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background: #fff4f8;
+    border: 2px solid #ffb5cd;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px #ff477e22;
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-align: center;
+    padding: 8px 12px;
+    min-width: 140px;
+    animation: hayirBlinkSoft 0.7s linear 0s 3 alternate;
+    z-index: 10;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@keyframes hayirBlinkSoft {
+    0%   { opacity: 0.2; }
+    40%  { opacity: 0.9; }
+    70%  { opacity: 0.15; }
+    100% { opacity: 0.9; }
+}
+
+.evet-buton {
+    display: inline-block;
+    padding: 7px 16px;
+    background-color: #ff477e;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 18px;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.14);
+    transition: background 0.3s ease;
+    font-family: 'Marck Script', cursive;
+    font-size: 15px;
+    margin: 0;
+    min-width: 74px;
+    border: none;
+    cursor: pointer;
+}
+
+.evet-buton:hover {
+    background-color: #e0386b;
+}
+
+/* ============= KALP (zarf üstü) ============= */
+.corazon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    background-color: var(--corazon);
+    transform: translate(-50%, 0) rotate(45deg);
+    transition: transform 0.5s ease-in-out 1s;
+    z-index: 999;
+    cursor: pointer;
+}
+
+.corazon::before,
+.corazon::after {
+    content: "";
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-color: var(--corazon);
+    border-radius: 100%;
+}
+
+.corazon:before { top: -15px; }
+.corazon:after  { right: 15px; }
+
+/* ============= AÇILMA ANİMASYONLARI ============= */
+.abierto .sobre::before {
+    transform: rotateX(180deg);
+    z-index: 0;
+}
+
+.abierto .corazon {
+    transform: rotate(90deg);
+    transition-delay: 0.4s;
+}
+
+.carta.mostrar-carta {
+    transform: translateY(-290px);
+    transition: transform .5s ease-in-out;
+}
+
+.carta.cerrando-carta {
+    transform: translateY(-290px);
+    transition: transform .5s ease-in-out;
+}
+
+.carta.abierta {
+    z-index: 10000;
+}
+
+.envoltura-sobre.desactivar-sobre .sobre::before {
+    pointer-events: none;
+}
+
+/* ============= FOOTER ============= */
+.copy {
+    color: #b3003c;
+    font-family: 'Marck Script', cursive;
+    font-size: 16px;
+    opacity: 0.7;
+    margin-top: 10px;
+}
+
+/* ============= RESPONSIVE ============= */
+@media screen and (max-width: 400px) {
+    .contenedor { width: 300px; }
+    .sobre {
+        width: 300px;
+        height: 250px;
+    }
+    .sobre::before {
+        border-top: 150px solid var(--solapa-sobre);
+        border-right: 150px solid transparent;
+        border-left: 150px solid transparent;
+    }
+    .evet-hayir-container { gap: 9px; }
+    .evet-buton {
+        padding: 5px 11px;
+        font-size: 13px;
+        min-width: 56px;
+    }
+    .yanan-baslik { font-size: 32px; }
+}
+
+/* ============= MOBILE RESPONSIVE EK DÜZENLEMELER ============= */
+
+/* Genel body: küçük ekranda padding ekle */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 20px 10px;
+        justify-content: flex-start;
+        padding-top: 24px;
+    }
+
+    .yanan-baslik {
+        font-size: 26px;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+
+    .yanan-baslik span {
+        font-size: 16px !important;
+    }
+
+    .contenedor {
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .sobre {
+        width: 100%;
+        max-width: 340px;
+        height: 240px;
+    }
+
+    .sobre::before {
+        border-top: 140px solid var(--solapa-sobre);
+        border-right: 170px solid transparent;
+        border-left: 170px solid transparent;
+    }
+
+    .carta.mostrar-carta,
+    .carta.cerrando-carta {
+        transform: translateY(-240px);
+    }
+
+    .contenido {
+        font-size: 18px;
+        padding: 8px;
+    }
+
+    .contenido strong {
+        font-size: 20px;
+    }
+
+    .evet-hayir-container {
+        gap: 10px;
+    }
+
+    .evet-buton {
+        padding: 8px 18px;
+        font-size: 14px;
+        min-width: 80px;
+    }
+}
+
+/* Çok küçük ekranlar (iPhone SE vb.) */
+@media screen and (max-width: 360px) {
+    .contenedor {
+        max-width: 300px;
+    }
+    .sobre {
+        max-width: 300px;
+        height: 220px;
+    }
+    .sobre::before {
+        border-top: 130px solid var(--solapa-sobre);
+        border-right: 150px solid transparent;
+        border-left: 150px solid transparent;
+    }
+    .carta.mostrar-carta,
+    .carta.cerrando-carta {
+        transform: translateY(-220px);
+    }
+    .yanan-baslik {
+        font-size: 22px;
+    }
+}
+
+/* Tablet */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .yanan-baslik {
+        font-size: 36px;
+    }
+}
